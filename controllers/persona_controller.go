@@ -71,7 +71,7 @@ func Delete(writer http.ResponseWriter, request *http.Request) {
 	db := common.GetConnection()
 	defer db.Close()
 
-	db.Find(persona, id)
+	db.Find(&persona, id)
 
 	if persona.ID > 0 {
 		db.Delete(persona)
