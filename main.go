@@ -13,6 +13,7 @@ func main() {
 	router := mux.NewRouter()
 
 	routes.SetUsersRoutes(router)
+	routes.SetAuthRoutes(router)
 
 	server := http.Server{
 		Addr:    ":8000",

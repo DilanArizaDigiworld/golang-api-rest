@@ -54,6 +54,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 
 	// Hash password
 	userPassword := user.Password
+	log.Print(userPassword)
 	hash, _ := secure.HashPassword(userPassword)
 	user.Password = hash
 
