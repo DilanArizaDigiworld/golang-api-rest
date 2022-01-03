@@ -1,7 +1,6 @@
 package common
 
 import (
-	"golang-rest-api/models"
 	"log"
 	"os"
 
@@ -33,13 +32,4 @@ func GetConnection() *gorm.DB {
 	}
 
 	return db
-}
-
-func Migrate() {
-	db := GetConnection()
-	defer db.Close()
-
-	log.Print("Migrando...")
-
-	db.AutoMigrate(&models.Persona{})
 }

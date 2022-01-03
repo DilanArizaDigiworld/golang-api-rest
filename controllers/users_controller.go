@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"golang-rest-api/common"
 	"golang-rest-api/models"
+	"golang-rest-api/secure"
 	"log"
 	"net/http"
 
@@ -11,26 +12,26 @@ import (
 )
 
 func GetAll(writer http.ResponseWriter, request *http.Request) {
-	personas := []models.Persona{}
+	users := []models.Users{}
 	db := common.GetConnection()
 	defer db.Close()
 
-	db.Find(&personas)
-	json, _ := json.Marshal(personas)
+	db.Find(&users)
+	json, _ := json.Marshal(users)
 	common.SendResponse(writer, http.StatusOK, json)
 }
 
 func Get(writer http.ResponseWriter, request *http.Request) {
-	persona := models.Persona{}
+	user := models.Users{}
 	id := mux.Vars(request)["id"]
 
 	db := common.GetConnection()
 	defer db.Close()
 
-	db.Find(&persona, id)
+	db.Find(&user, id)
 
-	if persona.ID > 0 {
-		json, _ := json.Marshal(persona)
+	if user.ID > 0 {
+		json, _ := json.Marshal(user)
 		common.SendResponse(writer, http.StatusOK, json)
 	} else {
 		common.SendError(writer, http.StatusNotFound)
@@ -38,12 +39,12 @@ func Get(writer http.ResponseWriter, request *http.Request) {
 }
 
 func Save(writer http.ResponseWriter, request *http.Request) {
-	persona := models.Persona{}
+	user := models.Users{}
 
 	db := common.GetConnection()
 	defer db.Close()
 
-	error := json.NewDecoder(request.Body).Decode(&persona)
+	error := json.NewDecoder(request.Body).Decode(&user)
 
 	if error != nil {
 		log.Fatal(error)
@@ -51,7 +52,12 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	error = db.Save(&persona).Error
+	// Hash password
+	userPassword := user.Password
+	hash, _ := secure.HashPassword(userPassword)
+	user.Password = hash
+
+	error = db.Save(&user).Error
 
 	if error != nil {
 		log.Fatal(error)
@@ -59,22 +65,22 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	json, _ := json.Marshal(persona)
+	json, _ := json.Marshal(user)
 
 	common.SendResponse(writer, http.StatusCreated, json)
 }
 
 func Delete(writer http.ResponseWriter, request *http.Request) {
-	persona := models.Persona{}
+	user := models.Users{}
 	id := mux.Vars(request)["id"]
 
 	db := common.GetConnection()
 	defer db.Close()
 
-	db.Find(&persona, id)
+	db.Find(&user, id)
 
-	if persona.ID > 0 {
-		db.Delete(persona)
+	if user.ID > 0 {
+		db.Delete(user)
 		common.SendResponse(writer, http.StatusOK, []byte(`{}`))
 	} else {
 		common.SendError(writer, http.StatusBadRequest)

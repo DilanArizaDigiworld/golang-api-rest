@@ -1,7 +1,6 @@
 package main
 
 import (
-	"golang-rest-api/common"
 	"golang-rest-api/routes"
 	"log"
 	"net/http"
@@ -10,11 +9,10 @@ import (
 )
 
 func main() {
-	common.Migrate()
 
 	router := mux.NewRouter()
 
-	routes.SetPersonaRoutes(router)
+	routes.SetUsersRoutes(router)
 
 	server := http.Server{
 		Addr:    ":8000",
